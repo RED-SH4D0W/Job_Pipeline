@@ -313,6 +313,15 @@ function classify(j) {
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+function timeAgo(ms) {
+  if (!ms) return '';
+  const s = Math.floor((Date.now() - ms) / 1000);
+  if (s < 60) return 'just now';
+  const m = Math.floor(s / 60); if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60); if (h < 24) return `${h} hour${h === 1 ? '' : 's'} ago`;
+  const d = Math.floor(h / 24); return `${d} day${d === 1 ? '' : 's'} ago`;
+}
+
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800);
@@ -461,7 +470,12 @@ function render() {
   ef.textContent = `✉ Has email (${ec})`;
   ef.classList.toggle('primary', onlyEmail);
   const list = visibleJobs();
-  $('dataSource').textContent = usingSample ? 'showing sample data' : (client ? `connected · ${jobs.length} jobs` : '');
+  let fresh = '';
+  if (!usingSample && jobs.length) {
+    const newest = jobs.reduce((mx, j) => Math.max(mx, new Date(j.created_at || 0).getTime() || 0), 0);
+    if (newest) fresh = ` · updated ${timeAgo(newest)}`;
+  }
+  $('dataSource').textContent = usingSample ? 'showing sample data' : (client ? `connected · ${jobs.length} jobs${fresh}` : '');
   if (!jobs.length) { renderState('empty'); return; }
   if (!list.length) { $('jobs').innerHTML = `<div class="state"><h3>Nothing here</h3><p>No jobs match this filter or search.</p></div>`; return; }
   $('jobs').innerHTML = list.map(card).join('');
