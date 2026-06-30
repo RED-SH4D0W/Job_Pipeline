@@ -523,6 +523,11 @@ $('catbar').addEventListener('click', e => { const t = e.target.closest('[data-c
 $('emailFilter').addEventListener('click', () => { onlyEmail = !onlyEmail; render(); });
 $('search').addEventListener('input', render);
 $('sort').addEventListener('change', render);
+// The Find Jobs button only works locally (it needs app.py). On the hosted
+// site GitHub Actions does the scraping, so hide the button there.
+if (!['localhost', '127.0.0.1', ''].includes(location.hostname)) {
+  $('findBtn').style.display = 'none';
+}
 $('findBtn').addEventListener('click', async () => {
   const btn = $('findBtn'), label = btn.textContent;
   btn.disabled = true; btn.textContent = '⟳ Finding… (~1 min)';
