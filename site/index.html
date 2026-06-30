@@ -313,6 +313,15 @@ function classify(j) {
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+let lastScrapeMs = 0;
+async function fetchLastScrape() {
+  try {
+    const r = await fetch('https://api.github.com/repos/RED-SH4D0W/Job_Pipeline/actions/runs?status=success&per_page=1');
+    const run = ((await r.json()).workflow_runs || [])[0];
+    if (run) { lastScrapeMs = new Date(run.run_started_at || run.created_at).getTime(); render(); }
+  } catch (e) { /* offline or rate-limited; fall back to newest-job time */ }
+}
+
 function timeAgo(ms) {
   if (!ms) return '';
   const s = Math.floor((Date.now() - ms) / 1000);
@@ -361,6 +370,7 @@ async function load() {
   if (error) { renderState('error', error.message); return; }
   jobs = data || [];
   render();
+  fetchLastScrape();
 }
 
 async function setStatus(id, status) {
@@ -471,9 +481,13 @@ function render() {
   ef.classList.toggle('primary', onlyEmail);
   const list = visibleJobs();
   let fresh = '';
-  if (!usingSample && jobs.length) {
-    const newest = jobs.reduce((mx, j) => Math.max(mx, new Date(j.created_at || 0).getTime() || 0), 0);
-    if (newest) fresh = ` · updated ${timeAgo(newest)}`;
+  if (!usingSample) {
+    if (lastScrapeMs) {
+      fresh = ` · last scraped ${timeAgo(lastScrapeMs)}`;
+    } else if (jobs.length) {
+      const newest = jobs.reduce((mx, j) => Math.max(mx, new Date(j.created_at || 0).getTime() || 0), 0);
+      if (newest) fresh = ` · updated ${timeAgo(newest)}`;
+    }
   }
   $('dataSource').textContent = usingSample ? 'showing sample data' : (client ? `connected · ${jobs.length} jobs${fresh}` : '');
   if (!jobs.length) { renderState('empty'); return; }
