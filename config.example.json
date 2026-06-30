@@ -1,0 +1,27 @@
+{
+  "_comment": "Copy this file to config.json and fill in your values. config.json stays private (it holds your key).",
+
+  "supabase_url": "https://YOUR-PROJECT.supabase.co",
+  "supabase_key": "YOUR-ANON-PUBLIC-KEY",
+
+  "dry_run": true,
+
+  "target_titles": [
+    "software developer", "software engineer", "game developer",
+    "frontend developer", "front end developer",
+    "full stack developer", "fullstack developer"
+  ],
+  "keywords": [
+    "react", "typescript", "javascript", "node", "frontend",
+    "front-end", "full stack", "ui", "web", "unity", "c#", "game"
+  ],
+  "exclude_keywords": [
+    "senior", "staff", "principal", "lead", "manager", "director", "head of", "vp"
+  ],
+  "locations_allow": ["united states", "remote", "usa"],
+
+  "companies": [
+    { "ats": "greenhouse", "token": "stripe", "name": "Stripe" },
+    { "ats": "ashby", "token": "linear", "name": "Linear" }
+  ]
+}

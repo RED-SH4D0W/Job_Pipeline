@@ -1,0 +1,31 @@
+name: Scrape jobs
+
+# Runs the scraper in the cloud on a schedule, plus a manual "Run" button.
+# Times are UTC. 11:00–17:00 UTC ≈ 7AM–1PM Eastern (US daylight time).
+on:
+  schedule:
+    - cron: "*/15 11-17 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Use the CI config (no secrets in it)
+        run: cp config.ci.json config.json
+
+      - name: Run the scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESUME_TEXT: ${{ secrets.RESUME_TEXT }}
+        run: python scraper.py

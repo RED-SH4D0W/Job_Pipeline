@@ -1,0 +1,8 @@
+# Never commit/publish secrets or personal files
+config.json
+Resume_PG.tex
+Resume_PG.pdf
+scraper.log
+*.pyc
+__pycache__/
+.DS_Store

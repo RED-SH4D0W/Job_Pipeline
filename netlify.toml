@@ -1,0 +1,4 @@
+# Netlify publishes ONLY the site/ folder (just index.html), so your config,
+# resume, and Python scripts never go public.
+[build]
+  publish = "site"
